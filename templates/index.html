@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulador PID | Tres celdas de flotación</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header><div><p>LABORATORIO VIRTUAL · AUTOMATIZACIÓN DE PROCESOS</p><h1>Control PI + Feedforward</h1><p>Tres celdas de flotación en serie · Modelo matemático con Python</p></div><span class="pill">● Simulación educativa</span></header>
+<main>
+<section class="panel"><h2>Configuración de la simulación</h2>
+  <div class="controls">
+    <label>Tipo de controlador<select id="modo"><option value="comparacion">Comparar PI / PI + FF</option><option value="pi">Solo PI</option><option value="piff">PI + Feedforward</option></select></label>
+    <label>Nuevo nivel deseado (cm)<input id="sp" type="number" min="23" max="36" step="1" value="32"></label>
+    <label>Perturbación de caudal (L/min)<input id="dist" type="number" min="-20" max="20" step="1" value="14"></label>
+    <label>Duración (segundos)<input id="duracion" type="number" min="180" max="1200" step="60" value="600"></label>
+    <button id="run">▶ Ejecutar simulación</button><button type="button" id="exportar" class="secondary-button">↓ Exportar CSV</button>
+  </div><div id="notice"></div>
+</section>
+<section class="layout">
+ <div class="panel">
+  <div class="row-head"><h2>Proceso industrial · niveles</h2><span id="estado" class="sub">Listo</span></div>
+  <div class="tank-area">
+   <div class="tank-unit"><p class="tank-title">CELDA 1</p><div class="tank"><div class="liquid" id="agua0"></div><div class="tank-center" id="h0">30.00</div></div><div class="tank-data"><span>Entrada: <b id="qin0">45.0</b> L/min</span><span>Bomba P-1: <b id="qout0">45.0</b> L/min</span></div></div>
+   <div class="tank-unit"><p class="tank-title">CELDA 2</p><div class="tank"><div class="liquid" id="agua1"></div><div class="tank-center" id="h1">30.00</div></div><div class="tank-data"><span>Entrada: <b id="qin1">45.0</b> L/min</span><span>Bomba P-2: <b id="qout1">45.0</b> L/min</span></div></div>
+   <div class="tank-unit"><p class="tank-title">CELDA 3</p><div class="tank"><div class="liquid" id="agua2"></div><div class="tank-center" id="h2">30.00</div></div><div class="tank-data"><span>Entrada: <b id="qin2">45.0</b> L/min</span><span>Bomba P-3: <b id="qout2">45.0</b> L/min</span></div></div>
+  </div>
+  <div class="timeline"><button id="play" class="small-button">▶ Reproducir</button><input type="range" id="slider" min="0" max="600" value="0"><span id="tiempo">0 s</span></div>
+  <p class="footer">El agua fluye de la celda 1 → 2 → 3 mediante bombas. El nivel inicial es 30 cm. En comparación, la animación muestra PI + FF; las gráficas presentan ambos controladores. Selecciona la celda en la sección de ecuaciones para cambiar las gráficas.</p>
+ </div>
+ <div class="panel"><h2>Indicadores matemáticos</h2><div class="stat-grid" id="stats"></div><div style="margin-top:18px"><h2>Errores acumulados (IAE)</h2><canvas id="errorChart" aria-label="IAE PI contra PI+FF"></canvas></div></div>
+</section>
+<section class="charts">
+ <div class="panel"><h2>Nivel de líquido frente al tiempo</h2><canvas id="nivelChart"></canvas><p class="legend"><span><i class="dot" style="background:#f7c56b"></i>Setpoint</span><span><i class="dot" style="background:#29c8e9"></i>PI</span><span><i class="dot" style="background:#35d7ad"></i>PI + FF</span></p></div>
+ <div class="panel"><h2>Caudal de salida de las bombas</h2><canvas id="bombaChart"></canvas><p class="legend"><span><i class="dot" style="background:#29c8e9"></i>PI</span><span><i class="dot" style="background:#35d7ad"></i>PI + FF</span></p></div>
+</section>
+<section class="panel equations">
+ <div class="row-head"><h2>Ecuaciones resueltas por Python</h2><label>Celda para inspeccionar<select id="celda"><option value="0">Celda 1</option><option value="1">Celda 2</option><option value="2">Celda 3</option></select></label></div>
+ <p class="muted">Desliza la línea de tiempo para inspeccionar los valores que Python calculó, paso a paso, en ese instante.</p>
+ <div class="math-grid"><div><p><b>1. Error y control proporcional</b></p><div class="eq" id="eqError"></div><p><b>2. Control PI y compensación feedforward</b></p><div class="eq" id="eqControl"></div></div><div><p><b>3. Ecuación diferencial del nivel</b></p><div class="eq" id="eqNivel"></div><p><b>4. Criterios de evaluación</b></p><div class="eq" id="eqMetrica"></div></div></div>
+ <p class="footer">Fundamento: Quintanilla et al., <em>MethodsX</em> 10 (2023), 102081, ecuaciones (1), (5), (7)–(9), tabla 2 y figuras 13–15. Se emplean los Kc, τi, retardos, k′ y Kff publicados. La dinámica discretizada, el escenario de perturbación, la saturación de caudal y la acumulación de cambios medidos de feedforward (equivalente a compensación respecto al caudal inicial) son simplificaciones para fines educativos, no una reproducción exacta de los ensayos de laboratorio.</p>
+</section>
+</main><script src="{{ url_for('static', filename='script.js') }}"></script>
+</body></html>
